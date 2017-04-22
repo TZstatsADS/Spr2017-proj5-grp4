@@ -1,0 +1,44 @@
+---
+title: "HR"
+author: "Kexin Nie"
+date: "April 21, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+data<-read.csv("HR_comma_sep.csv")
+install.packages(c("survival", "survminer"))
+library("survival")
+library("survminer")
+library("ggplot2")
+library("reshape2")
+#we first need to group some non-level variables
+#full model
+hr.cox <- coxph(Surv(time_spend_company, left) ~ salary+sales+satisfaction_level+last_evaluation+number_project+average_montly_hours+promotion_last_5years+Work_accident, data = data)
+#baseline values
+ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
+           ggtheme = theme_minimal())
+
+#Visualization for different variables
+#example: salary
+fit<-survfit(Surv(time_spend_company, left) ~ salary, data = data)
+ggsurvplot(fit,ggtheme = theme_minimal())
+
+# Create the new data  
+new <- with(data,
+               data.frame(satisfaction_level=c(0.9,0.8), last_evaluation=c(0.95,0.7),      number_project=c(1,0),    average_montly_hours=c(247,248),   Work_accident=c(1,0),     
+  promotion_last_5years=c(0,1),
+ sales=rep("sales",2) ,             
+ salary=c("low","high") 
+                          )
+               )
+#predicted values
+fit1<-survfit(hr.cox, newdata = new)
+predict<-data.frame(fit1$surv)
+```

@@ -1,0 +1,86 @@
+---
+title: "Human Resource"
+author: "yuan mei"
+date: "April 21, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(randomForest)
+library(randomForestSRC)
+library(caret)
+library(randomForest)
+library(corrplot)
+library(dplyr) 
+library(rattle)
+library("survival")
+library("survminer")
+library("ggplot2")
+library("reshape2")
+```
+
+##Step1 Processing Data 
+#import data
+```{r}
+setwd("~/Documents/GitHub/Spr2017-proj5-grp4/data")
+hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
+```
+
+#exploratory data analysis
+```{r}
+# Look at the data
+head(hr)
+summary(hr)
+str(hr)
+sum(is.na(hr))
+# Since we need categorical data when using Survival analysis model, we split the continous vairables(satisfaction_level,last_evaluation,average_monthly_hours into) into different categories according to the distribution.
+plot(ecdf(hr$satisfaction_level))
+plot(ecdf(hr$last_evaluation))
+plot(ecdf(hr$average_montly_hours))
+#as we can see in the plots, these three indicaters are nearly uniformly distributed.
+
+#As for "satisfaction_level",the staff tends to stay when satisfaction level<0.5;the staff tends to leave when satisfaction level>0.5; So we use quantile(0.5) to split the data.
+hr$left <- factor(data$left)
+ggplot(hr, aes(satisfaction_level)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("Satisfaction Level") + ylab("Density") + 
+  ggtitle("Density of Satisfaction Level")
+
+#As for "last evaluation", the staff's behaviors can be grouped into three groups."last evaluation" <0.6, 0.6<"last evaluation" <0.8,0.8 < last evaluation".
+ggplot(hr, aes(last_evaluation)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("last evaluation") + ylab("Density") + 
+  ggtitle("Density of last evaluation")
+
+#As for "average_montly_hours", the staff's behaviors can be grouped into three groups."average_montly_hours"<160, 160<"last evaluation" < 240, 240 < last evaluation".
+ggplot(hr, aes(average_montly_hours)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("average_montly_hours") + ylab("Density") + 
+  ggtitle("Density of average_montly_hours")
+
+#0 is not satisfied 1: very very happy
+satisfy<-rep(0,nrow(hr))
+satisfy[hr$satisfaction_level>= 0.5]<- 1
+satisfy<-factor(satisfy)
+hr$satisfy<-satisfy
+
+# 0 is low evaluation; 1 is medium evaluation; 2 is high evaluation.
+evaluate<-rep(0,nrow(hr))
+evaluate[hr$last_evaluation>= 0.6 & hr$last_evaluation<= 0.8]<- 1
+evaluate[hr$last_evaluation > 0.8] <-2
+evaluate<-factor(evaluate)
+hr$evaluate<-evaluate
+
+# 0 is spending low average monthly hours; 1 is spending medium average monthly hours; 2 is spending high average monthly hours.
+monthly.hours<-rep(0,nrow(hr))
+monthly.hours[hr$average_montly_hours>= 160 & hr$average_montly_hours<= 240]<- 1
+monthly.hours[hr$average_montly_hours > 240] <-2
+monthly.hours<-factor(monthly.hours)
+hr$monthly.hours<-monthly.hours
+```
+
+

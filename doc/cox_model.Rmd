@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 ```{r}
-hr<-read.csv("/Users/xuxuanzi/Desktop/Spr2017-proj5-grp4/data/HR_comma_sep.csv")
+hr<-read.csv("../data/HR_comma_sep.csv")
 
 # load package
 if (!require("corrplot")) install.packages('corrplot')

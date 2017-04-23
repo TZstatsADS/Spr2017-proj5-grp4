@@ -112,7 +112,7 @@ ggsurvplot(fit,ggtheme = theme_minimal())
 
 
 # predict new data  
-new <- with(data,
+new <- with(hr,
                data.frame(satisfy=c(0.9,0.8), Work_accident=c(1,0), promotion_last_5years=c(0,1))
                )
 #predicted values

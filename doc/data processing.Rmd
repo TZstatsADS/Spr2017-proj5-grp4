@@ -28,24 +28,12 @@ library("survminer")
 library("ggplot2")
 library("reshape2")
 
-# load package
-if (!require("corrplot")) install.packages('corrplot')
-if (!require("survival")) install.packages('survival')
-if (!require("survminer")) install.packages('survminer')
-
-#library package
-library("survival")
-library("survminer")
-library("ggplot2")
-library("reshape2")
-library("corrplot")
 ```
 
 ##Step1 Processing Data 
 #import data
 ```{r}
-setwd("~/Documents/GitHub/Spr2017-proj5-grp4/data")
-hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
+hr <- as.data.frame(read.csv("../data/HR_comma_sep.csv") )
 ```
 
 #exploratory data analysis

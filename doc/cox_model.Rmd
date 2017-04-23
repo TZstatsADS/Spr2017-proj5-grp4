@@ -28,7 +28,7 @@ library("corrplot")
 
 #we first need to group some non-level variables
 #full model
-hr.cox <- coxph(Surv(time_spend_company, left) ~ salary+sales+satisfaction_level+last_evaluation+number_project+average_montly_hours+promotion_last_5years+Work_accident, data = data)
+hr.cox <- coxph(Surv(time_spend_company, left) ~ salary+sales+satisfaction_level+last_evaluation+number_project+average_montly_hours+promotion_last_5years+Work_accident, data = hr)
 #baseline values
 ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
            ggtheme = theme_minimal())

@@ -50,7 +50,7 @@ plot(ecdf(hr$average_montly_hours))
 #as we can see in the plots, these three indicaters are nearly uniformly distributed.
 
 #As for "satisfaction_level",the staff tends to stay when satisfaction level<0.5;the staff tends to leave when satisfaction level>0.5; So we use quantile(0.5) to split the data.
-hr$left <- factor(data$left)
+hr$left <- factor(hr$left)
 ggplot(hr, aes(satisfaction_level)) + 
   geom_density(aes(group = left, fill = left), alpha = 0.5) + 
   theme_bw() + xlab("Satisfaction Level") + ylab("Density") + 
@@ -107,7 +107,7 @@ ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
 
 #Visualization for different variables
 #example: salary
-fit<-survfit(Surv(time_spend_company, left) ~ satisfy+promotion_last_5years+Work_accident, data = data)
+fit<-survfit(Surv(time_spend_company, left) ~ satisfy+promotion_last_5years+Work_accident, data = hr)
 ggsurvplot(fit,ggtheme = theme_minimal())
 
 

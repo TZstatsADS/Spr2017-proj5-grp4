@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 ```{r}
-hr<-read.csv("../data/HR_comma_sep.csv")
+data <- read.csv("../data/HR_comma_sep.csv")
 
 # load package
 if (!require("corrplot")) install.packages('corrplot')
@@ -28,7 +28,7 @@ library("corrplot")
 
 #we first need to group some non-level variables
 #full model
-hr.cox <- coxph(Surv(time_spend_company, left) ~ salary+sales+satisfaction_level+last_evaluation+number_project+average_montly_hours+promotion_last_5years+Work_accident, data = hr)
+hr.cox <- coxph(Surv(time_spend_company, left) ~ salary+sales+satisfaction_level+last_evaluation+number_project+average_montly_hours+promotion_last_5years+Work_accident, data = data)
 #baseline values
 ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
            ggtheme = theme_minimal())

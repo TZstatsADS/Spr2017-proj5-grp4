@@ -30,13 +30,13 @@ library("reshape2")
 
 ```
 
-##Step1 Processing Data 
-#import data
+#Step1 Processing Data 
+###import data
 ```{r}
 hr <- as.data.frame(read.csv("../data/HR_comma_sep.csv") )
 ```
 
-#exploratory data analysis
+###exploratory data analysis
 ```{r}
 # Look at the data
 head(hr)
@@ -67,7 +67,10 @@ ggplot(hr, aes(average_montly_hours)) +
   geom_density(aes(group = left, fill = left), alpha = 0.5) + 
   theme_bw() + xlab("average_montly_hours") + ylab("Density") + 
   ggtitle("Density of average_montly_hours")
+```
 
+###Generate Dataframe
+```{r}
 #0 is not satisfied 1: very very happy
 satisfy<-rep(0,nrow(hr))
 satisfy[hr$satisfaction_level>= 0.5]<- 1
@@ -87,8 +90,10 @@ hr$monthly.hours<-monthly.hours
 
 # Work accident
 hr$Work_accident<-ifelse(as.logical(hr$Work_accident), 0, 1)
+```
 
-# Correlation plot
+### Correlation plot
+```{r}
 M<-hr[,c(-9,-10)]
 M$left<-as.numeric(M$left)
 M<-M[,c(-1,-2,-4)]
@@ -98,7 +103,7 @@ corrplot( M ,is.corr = FALSE, type = "full", order = "hclust",
 # as we can see from the correlation plot, the variables "Satify","Promotion_last_5years","Work_accident" is highly correlated staff status "left". So we choose these indicators as our feartures.
 ```
 
-##Step 2 Survival Analysis
+#Step 2 Survival Analysis
 ```{r}
 #we first need to group some non-level variables
 #cox model

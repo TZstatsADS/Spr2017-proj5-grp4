@@ -85,6 +85,9 @@ monthly.hours[hr$average_montly_hours>= 160 & hr$average_montly_hours<= 240]<- 1
 monthly.hours[hr$average_montly_hours > 240] <-2
 hr$monthly.hours<-monthly.hours
 
+# Work accident
+hr$Work_accident<-ifelse(as.logical(hr$Work_accident), 0, 1)
+
 # Correlation plot
 M<-hr[,c(-9,-10)]
 M$left<-as.numeric(M$left)
@@ -100,13 +103,14 @@ corrplot( M ,is.corr = FALSE, type = "full", order = "hclust",
 #we first need to group some non-level variables
 #cox model
 hr$left<-as.numeric(hr$left)
-hr.cox <- coxph(Surv(time_spend_company, left) ~ satisfy+promotion_last_5years+Work_accident, data = hr)
+hr.cox <- coxph(Surv(time_spend_company, left) ~
+                  satisfy+promotion_last_5years+Work_accident, data = hr)
 #baseline values
 ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
            ggtheme = theme_minimal())
 
 #Visualization for different variables
-#example: salary
+#example: satisfy+promotion_last_5years+Work_accident
 fit<-survfit(Surv(time_spend_company, left) ~ satisfy+promotion_last_5years+Work_accident, data = hr)
 ggsurvplot(fit,ggtheme = theme_minimal())
 

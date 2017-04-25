@@ -57,7 +57,7 @@ hrpredict <- function(satislevel,workaccid,promt){
 
     predict_long<-melt(predict, id = "time")
     plot_ly(x=predict_long$time,y=predict_long$value, type = 'scatter' ,
-            mode = 'lines+markers' ,line=list(color = 'rgb(205, 12, 24)', width = 2)) %>% layout(yaxis=list(range=c(0.5,1))) %>% layout(paper_bgcolor='transparent') %>% layout(plot_bgcolor='transparent')
+            mode = 'lines+markers' ,line=list(color = 'rgb(205, 12, 24)', width = 2)) %>% layout(yaxis=list(range=c(0,1))) %>% layout(paper_bgcolor='transparent') %>% layout(plot_bgcolor='transparent')
     # ggplot(data=predict_long, aes(x=time, y=value, colour=variable))+
     #   geom_line()
 

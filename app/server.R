@@ -22,8 +22,8 @@ library("reshape2")
 
 
 
-
-hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
+load("hr.RData")
+#hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
 
 hrpredict <- function(satislevel,workaccid,promt){
     hr$left <- factor(hr$left)

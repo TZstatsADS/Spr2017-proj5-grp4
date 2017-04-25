@@ -16,6 +16,8 @@ div.outer {
 body, label, input, button, select { 
   font-family: 'Helvetica Neue', Helvetica;
   font-weight: 200;
+  background-image: url("HR2.png");
+  background-position: left top;
 }
 h1, h2, h3, h4 { font-weight: 400; }
 
@@ -31,7 +33,7 @@ h1, h2, h3, h4 { font-weight: 400; }
 }
 #controls:hover {
   /* Fade in while hovering */
-  opacity: 0.95;
+  opacity: 0.25;
   transition-delay: 0;
 }
 

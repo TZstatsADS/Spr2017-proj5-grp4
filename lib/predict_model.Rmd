@@ -1,0 +1,120 @@
+---
+title: "Predict"
+author: "sh3559"
+date: "April 26, 2017"
+output: html_document
+---
+```{r}
+setwd("C:/Users/sh355/Desktop/columbia/2nd Semester/Applied Data Science/Spr2017-proj5-grp4")
+```
+```{r}
+library(caret)
+library(rpart)
+library(rattle)
+library(rpart.plot)
+```
+
+```{r, echo=F, message=F, warning=F}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggvis)
+library(corrplot)
+library(DT)
+hr = read.csv('./data/HR_comma_sep.csv', header = T, as.is = T)
+head(hr)
+```
+```{r, message=F, warning=F, fig.width=10}
+HR_correlation <- hr %>% select(satisfaction_level:promotion_last_5years)
+M <- cor(HR_correlation)
+corrplot(M, method="circle")
+```
+```{r, message=F, warning=F, fig.width=10}
+cor(HR_correlation)
+```
+```{r, warning=F, fig.width=10}
+hr_model <- hr %>% filter(last_evaluation >= 0.70 | time_spend_company >= 4 | number_project > 5)
+summary(hr_model)
+```
+### Cross-Validation
+
+```{r, echo=T, warning=F, fig.width=10}
+# Set the target variable as a factor
+hr_model$left <- as.factor(hr_model$left)
+## install.packages("caret") 
+library("caret")
+# cross-validation
+train_control<- trainControl(method="cv", number=5, repeats=3)
+head(train_control)
+```
+### Tree learning
+
+```{r, warning=F, fig.width=10}
+# train the model 
+rpartmodel<- train(left~., data=hr_model, trControl=train_control, method="rpart")
+# make predictions
+predictions<- predict(rpartmodel,hr_model)
+hr_model_tree<- cbind(hr_model,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(hr_model_tree$predictions,hr_model_tree$left)
+confusionMatrix
+
+fancyRpartPlot(rpartmodel$finalModel)
+
+library("ROCR")
+hr_model_tree$predictions <- as.numeric(paste(hr_model_tree$predictions))
+# 
+perf.obj <- prediction(predictions=hr_model_tree$predictions, labels=hr_model_tree$left)
+# # Get data for ROC curve
+roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
+```
+### Naives Bayes
+
+```{r, echo=F, warning=F, fig.width=10}
+library(e1071)
+library(rminer)
+```
+
+```{r, warning=F, fig.width=10}
+# train the model 
+e1071model2 <- train(left~., data=hr_model, trControl=train_control, method="nb")
+# make predictions
+predictions<- predict(e1071model2,hr_model)
+e1071modelbinded <- cbind(hr_model,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(e1071modelbinded$predictions,e1071modelbinded$left)
+confusionMatrix
+```
+### Logistic regression
+
+```{r, warning=F, fig.width=10}
+# train the model 
+gmlmodel <- train(left~., data=hr_model, trControl=train_control, method="LogitBoost")
+# make predictions
+predictions<- predict(gmlmodel,hr_model)
+gmlmodelbinded <- cbind(hr_model,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(gmlmodelbinded$predictions,gmlmodelbinded$left)
+confusionMatrix
+
+# library("ROCR")
+# gmlmodelbinded$predictions <- as.numeric(paste(gmlmodelbinded$predictions))
+# 
+# perf.obj <- prediction(predictions=gmlmodelbinded$predictions, labels=gmlmodelbinded$left)
+# # Get data for ROC curve
+# roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
+# plot(roc.obj,
+#      main="Cross-Sell - ROC Curves",
+#      xlab="1 - Specificity: False Positive Rate",
+#      ylab="Sensitivity: True Positive Rate",
+#      col="blue")
+# abline(0,1,col="grey")
+
+```

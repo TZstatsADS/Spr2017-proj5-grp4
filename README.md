@@ -5,7 +5,7 @@ Term: Spring 2017
 + Team #4
 + Projec title: How long will you stay? ---Human Resource Advisory App
 + Team members
-	+ Presenter:
+	+ Presenter: Yuan Mei
 	+ Yingxin Zhang
 	+ Kexin Nie
 	+ Xuanzi Xu

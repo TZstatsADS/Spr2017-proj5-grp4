@@ -14,6 +14,7 @@ Term: Spring 2017
 + Project summary: Our project used human resource data provided on Kaggle to analyze the possible decision employees make in the future. We built an ShinyApp to give a prediction of the chance of employees leaving the company in the following years with other additional functions. 
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
+	
 	+ Yingxin Zhang: ShinyApp
 	+ Kexin Nie Model-building
 	+ Xuanzi Xu  Model-building

@@ -1,9 +1,9 @@
-# ADS Project 5: 
+# ADS Project 5: Open Topic
 
 Term: Spring 2017
 
 + Team #4
-+ Projec title: How long will you stay? ---Human Resource Advisory App
++ Projec title: Who will leave next? ---Human Resource Advisory Report
 + Team members
 	+ Presenter: Yuan Mei
 	+ Yingxin Zhang
@@ -11,7 +11,7 @@ Term: Spring 2017
 	+ Xuanzi Xu
 	+ Senyao Han
 	+ He Zhu
-+ Project summary: Our project used human resource data provided on Kaggle to analyze the possible decision employees make in the future. We built an ShinyApp to give a prediction of the chance of employees leaving the company in the following years with other additional functions. 
++ Project summary: In our project,we use human resource data provided on Kaggle to analyze that under different scenario how likely an employee will leave in the following years. We use two models: For the Cox Regression model in survival analysis, we forecast the leaving probability in the next few years. For the Random Forest model, we predict the current state(leave/stay) of an employee given different conditions. We develope an RShiny app for users to explore our models and form a report to give our analysis explicitly.
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 	

@@ -33,14 +33,14 @@ corrplot(M, method="circle")
 cor(HR_correlation)
 ```
 ```{r, warning=F, fig.width=10}
-hr_model <- hr %>% filter(last_evaluation >= 0.70 | time_spend_company >= 4 | number_project > 5)
-summary(hr_model)
+#hr_model <- hr %>% filter(last_evaluation >= 0.70 | time_spend_company >= 4 | number_project > 5)
+#summary(hr_model)
 ```
 ### Cross-Validation
 
 ```{r, echo=T, warning=F, fig.width=10}
 # Set the target variable as a factor
-hr_model$left <- as.factor(hr_model$left)
+hr$left <- as.factor(hr$left)
 ## install.packages("caret") 
 library("caret")
 # cross-validation
@@ -51,10 +51,10 @@ head(train_control)
 
 ```{r, warning=F, fig.width=10}
 # train the model 
-rpartmodel<- train(left~., data=hr_model, trControl=train_control, method="rpart")
+rpartmodel<- train(left~., data=hr, trControl=train_control, method="rpart")
 # make predictions
-predictions<- predict(rpartmodel,hr_model)
-hr_model_tree<- cbind(hr_model,predictions)
+predictions<- predict(rpartmodel,hr)
+hr_model_tree<- cbind(hr,predictions)
 # summarize results
 confusionMatrix<- confusionMatrix(hr_model_tree$predictions,hr_model_tree$left)
 confusionMatrix
@@ -84,10 +84,10 @@ library(rminer)
 
 ```{r, warning=F, fig.width=10}
 # train the model 
-e1071model2 <- train(left~., data=hr_model, trControl=train_control, method="nb")
+e1071model2 <- train(left~., data=hr, trControl=train_control, method="nb")
 # make predictions
-predictions<- predict(e1071model2,hr_model)
-e1071modelbinded <- cbind(hr_model,predictions)
+predictions<- predict(e1071model2,hr)
+e1071modelbinded <- cbind(hr,predictions)
 # summarize results
 confusionMatrix<- confusionMatrix(e1071modelbinded$predictions,e1071modelbinded$left)
 confusionMatrix
@@ -96,10 +96,10 @@ confusionMatrix
 
 ```{r, warning=F, fig.width=10}
 # train the model 
-gmlmodel <- train(left~., data=hr_model, trControl=train_control, method="LogitBoost")
+gmlmodel <- train(left~., data=hr, trControl=train_control, method="LogitBoost")
 # make predictions
-predictions<- predict(gmlmodel,hr_model)
-gmlmodelbinded <- cbind(hr_model,predictions)
+predictions<- predict(gmlmodel,hr)
+gmlmodelbinded <- cbind(hr,predictions)
 # summarize results
 confusionMatrix<- confusionMatrix(gmlmodelbinded$predictions,gmlmodelbinded$left)
 confusionMatrix

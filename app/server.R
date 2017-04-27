@@ -123,6 +123,17 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
 
  }
 
+
+load("hr.RData")
+pred<-matrix(NA,nrow =1,ncol= ncol(hr))
+colnames(pred)<-colnames(hr)
+hr_zhu<-hr
+hr_zhu$left <- as.factor(hr_zhu$left)
+hr_zhu$salary <- ordered(hr_zhu$salary, c("low", "medium", "high"))
+pred <- hr_zhu[1,]
+randomforest.Model <- randomForest(left~ .,hr_zhu,ntree=25)
+thisrf.predict<-3
+
 #size = ~prob*50,
 shinyServer(function(input, output) {
   
@@ -144,7 +155,63 @@ shinyServer(function(input, output) {
   # output$value <- renderPrint({
   #   str(input$file)
   # })
-  # 
+
+    
+    output$plot2<- 
+      renderImage({
+        return(list(
+          src = "www/dec.png",
+          contentType = "image/png",
+          width = 600,
+          height = 400,
+          alt = "dec"
+        ))
+      }, deleteFile = F)
+
+  observeEvent(input$action2,{
+    pred[1]<- input$satis2
+    pred[2]<- input$Evaluation
+    pred[3]<-input$num3
+    pred[4]<-input$num4
+    pred[6]<- input$workacc2
+    pred[8]<- input$promt2
+    
+    thisrf.predict <- predict(randomforest.Model,pred)
+    
+    if(thisrf.predict == 1){
+      output$text1<-renderText({ 
+        "I'm fucking leaving!"
+      })
+      output$plot2<- 
+        renderImage({
+          return(list(
+            src = "www/quit.png",
+            contentType = "image/png",
+            width = 600,
+            height = 400,
+            alt = "quit"
+          ))
+        }, deleteFile = F)
+      
+    }
+    else if(thisrf.predict == 0){
+      output$text1<-renderText({ 
+        "I'm gonna stay!"
+      })
+      output$plot2 <- 
+        renderImage({
+          return(list(
+            src = "www/stay.png",
+            contentType = "image/png",
+            width = 600,
+            height = 400,
+            alt = "stay"
+          ))
+        }, deleteFile = F)
+      
+      
+    }
+  })
 })
 
 

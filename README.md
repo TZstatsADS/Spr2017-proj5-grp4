@@ -10,7 +10,7 @@ Term: Spring 2017
 	+ Kexin Nie
 	+ Xuanzi Xu
 	+ Senyao Han
-	+ Laffi Han
+	+ Laffi Ju
 	+ He Zhu
 + Project summary: In our project,we use human resource data provided on Kaggle to analyze that under different scenario how likely an employee will leave in the following years. We use two models: For the Cox Regression model in survival analysis, we forecast the leaving probability in the next few years. For the Random Forest model, we predict the current state(leave/stay) of an employee given different conditions. We develope an RShiny app for users to explore our models and form a report to give our analysis explicitly.
 	

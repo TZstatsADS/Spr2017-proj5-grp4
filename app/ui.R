@@ -10,7 +10,7 @@ library(dplyr)
 library(ggvis)
 library(plotly)
 
-load("hr.RData")
+#load("hr.RData")
 
 shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                
@@ -55,7 +55,10 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   column(3,
                                          wellPanel(
                                            h4("Select Your Employee's Conditions"),
-                                           #fileInput("file", label = h3("File input")),
+                                           fileInput("file", label = h3("File input"),accept=c('text/csv',
+                                                                                               'text/comma-separated-values,text/plain',
+                                                                                               '.csv')),
+                                           actionButton("goButton", "Go!"),
                                            radioButtons("satislevel", label = h3("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
                                            radioButtons("workaccid", label = h3( "Work Accidents"),choices = list("Have"=1,"Don't Have"=0),selected=1),
                                            radioButtons("promt", label = h3("Promotions in Last 5 Years"), choices = list("Have"=1,"Don't Have"=0),selected=1)
@@ -78,9 +81,9 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   br(),
                                   br(),
                                    column(9,
-                                          
+                                          #verbatimTextOutput("value")
                                          plotlyOutput("plot")
-                                         
+
                                   )
                                 )
                               )

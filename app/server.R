@@ -22,11 +22,23 @@ library("reshape2")
 
 
 
-load("hr.RData")
+#load("hr.RData")
 #hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
-#hr <- load(input$file)
-hrpredict <- function(satislevel,workaccid,promt){
-  
+#hr <- input$file
+hrpredict <- function(hr,satislevel,workaccid,promt){
+    # hr<-list()
+    # hr$satisfaction_level<-rr()$satisfaction_level
+    # hr$last_evaluation<-rr()$last_evaluation
+    # hr$left<-rr()$left
+    # hr$number_project<-rr()$number_project
+    # hr$average_montly_hours<-rr()$average_montly_hours
+    # hr$time_spend_company<-as.numeric(rr()$time_spend_company)
+    # #hr$Work_accident<-rr()$Work_accident
+    # #hr$promotion_last_5years<-rr()$promotion_last_5years
+    # hr$sales<-rr()$sales
+    # hr$salary<-rr()$salary
+    # hr<-as.data.frame(hr)
+    
     hr$left <- factor(hr$left)
     satisfy<-rep(0,nrow(hr))
     satisfy[hr$satisfaction_level>= 0.5]<- 1
@@ -45,9 +57,9 @@ hrpredict <- function(satislevel,workaccid,promt){
     hr$left<-as.numeric(hr$left)
     hr.cox <- coxph(Surv(time_spend_company, left) ~ satisfy+promotion_last_5years+Work_accident, data = hr)
 
-    
-    
-    
+
+
+
     new <- with(hr,
             data.frame(satisfy=satislevel, Work_accident=workaccid, promotion_last_5years=promt)
     )
@@ -56,9 +68,9 @@ hrpredict <- function(satislevel,workaccid,promt){
     predict<-data.frame(fit1$surv)
     predict$time<-1:8
     predict_long<-melt(predict, id = "time")
-    
-    
-    hr1 <- data.frame(work = hr$Work_accident, prom = hr$promotion_last_5years, 
+
+
+    hr1 <- data.frame(work = hr$Work_accident, prom = hr$promotion_last_5years,
                       satisfy = hr$satisfy, left = hr$left, time = hr$time_spend_company)
     hr2 <- subset(hr1, left != 1)
     hr2<-hr2[,-4]
@@ -72,15 +84,34 @@ hrpredict <- function(satislevel,workaccid,promt){
         stay[i] <- stay[i-1]
       }
     }
-    
+
     prob <- stay/total
     n<-sum(prob !=0)
     df<-data.frame(years = 1:n, prob = prob[1:n], pop = stay[1:n])
-    plot_ly(df, x = ~years, y = ~prob, type = 'scatter', mode = 'markers',
-            marker = list( size=30,opacity = 0.5)
-    )%>%add_lines(x=predict_long$time,y=predict_long$value,  type = 'scatter' ,
-                                            mode = 'lines+markers' ,line=list(color = 'rgb(205, 12, 24)', width = 2)) %>% layout( title = 'Who will stay',xaxis = list(title = 'Years', range = c(0,9)),yaxis=list(title = 'Probability of Stay',range=c(0,1.5)) ,showlegend = FALSE) %>% layout(paper_bgcolor='transparent') %>% layout(plot_bgcolor='transparent')
+    upper<-fit1$upper
+    lower<-fit1$lower
+    p <- plot_ly(predict_long, x = ~time) %>%
+      add_lines(y = ~value,
+                line = list(color = 'rgba(7, 164, 181, 1)')) %>%
+      add_ribbons(ymin = lower,
+                  ymax = upper,
+                  line = list(color = 'rgba(7, 164, 181, 0.05)'),
+                  fillcolor = 'rgba(7, 164, 181, 0.2)',
+                  name = "Confidence Interval") %>%
+      add_markers(x=df$years, y = df$prob, showlegend = FALSE,
+                  marker = list(size = df$pop/max(df$pop)*30,opacity = 0.2, color = 'rgb(255, 25, 24)')) %>%
+      layout(title = 'Who will stay',
+             xaxis = list(title = 'Years', range=c(0,8)),
+             yaxis = list(title = 'Probability of Stay',range=c(0,1.1)),
+             showlegend = FALSE)%>% 
+      layout(paper_bgcolor='transparent')%>%
+      layout(plot_bgcolor='transparent')
     
+    # plot_ly(df, x = ~years, y = ~prob, type = 'scatter', mode = 'markers',
+    #         marker = list( size=30,opacity = 0.5)
+    # )%>%add_lines(x=predict_long$time,y=predict_long$value,  type = 'scatter' ,
+    #                                         mode = 'lines+markers' ,line=list(color = 'rgb(205, 12, 24)', width = 2)) %>% layout( title = 'Who will stay',xaxis = list(title = 'Years', range = c(0,9)),yaxis=list(title = 'Probability of Stay',range=c(0,1.5)) ,showlegend = FALSE) %>% layout(paper_bgcolor='transparent') %>% layout(plot_bgcolor='transparent')
+
     # plot_ly(x = xx$years, y = xx$prob, type = 'scatter', mode = 'markers',
     #         color = as.factor(xx$years), colors = 'Paired',
     #         marker = list(size = xx$prob*50, opacity = 0.5))%>%
@@ -90,14 +121,30 @@ hrpredict <- function(satislevel,workaccid,promt){
     #          showlegend = FALSE)
  
 
-}
+ }
 
 #size = ~prob*50,
 shinyServer(function(input, output) {
-
-  output$plot <- renderPlotly({hrpredict(satislevel=as.numeric(input$satislevel),workaccid=as.numeric(input$workaccid),promt=as.numeric(input$promt))})
-
   
+  # hr <- reactive({
+  #   infile <- input$datafile
+  #   if (is.null(infile)) {
+  #     # User has not uploaded a file yet
+  #     return(NULL)
+  #   }
+  #   read.csv(infile$datapath)
+  # })
+  output$plot <- renderPlotly({
+    input$goButton
+    inFile <- isolate(input$file)
+    
+    if (is.null(inFile)) return(NULL)
+    hr <- read.csv(inFile$datapath, header = TRUE)
+    hrpredict(hr,satislevel=as.numeric(input$satislevel),workaccid=as.numeric(input$workaccid),promt=as.numeric(input$promt))})
+  # output$value <- renderPrint({
+  #   str(input$file)
+  # })
+  # 
 })
 
 

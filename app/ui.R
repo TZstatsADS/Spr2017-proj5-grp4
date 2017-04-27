@@ -18,7 +18,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                             sidebarLayout(
                               div(class="side", sidebarPanel(width=0)),
                               mainPanel(width=12,
-                                        img(src="HR.png", style="width:100%")
+                                        img(src="HR1.png", style="width:100%")
                                         )
                             )
                           ),
@@ -55,10 +55,10 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   column(3,
                                          wellPanel(
                                            h4("Select Your Employee's Conditions"),
-                                           sliderInput("satislevel", label = h3("Satisfaction Level"), min = 0,
-                                                       max = 1, value = 0.5),
-                                           selectInput("workaccid", label = h3( "Work Accidents"),choices = list("Have"=1,"Don't Have"=0),selected=1),
-                                           numericInput("promt", label = h3("Promotions in Last 5 Years"), value = 0,min=0)
+                                           #fileInput("file", label = h3("File input")),
+                                           radioButtons("satislevel", label = h3("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
+                                           radioButtons("workaccid", label = h3( "Work Accidents"),choices = list("Have"=1,"Don't Have"=0),selected=1),
+                                           radioButtons("promt", label = h3("Promotions in Last 5 Years"), choices = list("Have"=1,"Don't Have"=0),selected=1)
                                            # radioButtons("salary", label = h3("Salary"),
                                            #            choices = list("High" = "high", "Medium" = "medium", "Low" = "low"),
                                            #            selected = 1),
@@ -74,7 +74,11 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                            
                                          )
                                   ),
-                                  column(9,
+                                  br(),
+                                  br(),
+                                  br(),
+                                   column(9,
+                                          
                                          plotlyOutput("plot")
                                          
                                   )

@@ -1,7 +1,7 @@
 library(dplyr)
 library(plotly)
 
-hr <- as.data.frame(read.csv("../data/HR_comma_sep.csv") )
+# Here, hr dataframe is the one after data processing
 
 hr1 <- data.frame(work = hr$Work_accident, prom = hr$promotion_last_5years, 
                   satisfy = hr$satisfy, left = hr$left, time = hr$time_spend_company)

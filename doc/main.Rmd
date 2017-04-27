@@ -1,0 +1,199 @@
+---
+title: "Applied Data Science Spring 2017 Project5 Team4 Main Report"
+author: "Yuan Mei, Yingxin Zhang, Kexin Nie, Xuanzi Xu, Senyao Han, He Zhu"
+date: "April 25, 2017"
+output: word_document
+---
+![](entrepreneurs.jpg)
+
+
+
+#Introduction  
+
+The purpose of our project is to make a prediction of employees' future decision(Whether they will leave the company), using the human resource data on Kaggle. We think our app will be useful for Human Resource decision making and also social work research. Our data set contains information for 14999 employees, which include their income, satifaction of the current company and whether have promotion, etc. The data set also provides their current status(left or not).
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE}
+# load package
+#if (!require("corrplot")) install.packages('corrplot')
+#if (!require("survival")) install.packages('survival')
+#if (!require("survminer")) install.packages('survminer')
+
+library(corrplot)
+library(dplyr) 
+library(rattle)
+library(survival)
+library(survminer)
+library(ggplot2)
+library(reshape2)
+
+```
+
+#Step1 Processing Data 
+###Import data
+```{r,echo=FALSE}
+hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
+```
+
+###Exploratory data analysis
+
+Since we need categorical data when using Survival analysis model, we split the continous vairables(satisfaction_level,last_evaluation,average_monthly_hours into) into different categories according to the distribution.As we can see in the plots, these three indicaters are nearly uniformly distributed.As for "satisfaction_level",the staff tends to stay when satisfaction level<0.5;the staff tends to leave when satisfaction level>0.5; So we use quantile(0.5) to split the data.As for "last evaluation", the staff's behaviors can be grouped into three groups."last evaluation" <0.6, 0.6<"last evaluation" <0.8,0.8 < last evaluation".As for "average_montly_hours", the staff's behaviors can be grouped into three groups."average_montly_hours"<160, 160<"last evaluation" < 240, 240 < last evaluation".
+
+```{r}
+
+plot(ecdf(hr$satisfaction_level))
+plot(ecdf(hr$last_evaluation))
+plot(ecdf(hr$average_montly_hours))
+```
+
+
+```{r}
+hr$left <- factor(hr$left)
+ggplot(hr, aes(satisfaction_level)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("Satisfaction Level") + ylab("Density") + 
+  ggtitle("Density of Satisfaction Level")
+```
+
+
+```{r}
+ggplot(hr, aes(last_evaluation)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("last evaluation") + ylab("Density") + 
+  ggtitle("Density of last evaluation")
+```
+
+
+```{r,echo=FALSE}
+ggplot(hr, aes(average_montly_hours)) + 
+  geom_density(aes(group = left, fill = left), alpha = 0.5) + 
+  theme_bw() + xlab("average_montly_hours") + ylab("Density") + 
+  ggtitle("Density of average_montly_hours")
+```
+
+###Generate Dataframe
+```{r}
+#0 is not satisfied 1: very very happy
+satisfy<-rep(0,nrow(hr))
+satisfy[hr$satisfaction_level>= 0.5]<- 1
+hr$satisfy<-satisfy
+
+# 0 is low evaluation; 1 is medium evaluation; 2 is high evaluation.
+evaluate<-rep(0,nrow(hr))
+evaluate[hr$last_evaluation>= 0.6 & hr$last_evaluation<= 0.8]<- 1
+evaluate[hr$last_evaluation > 0.8] <-2
+hr$evaluate<-evaluate
+
+# 0 is spending low average monthly hours; 1 is spending medium average monthly hours; 2 is spending high average monthly hours.
+monthly.hours<-rep(0,nrow(hr))
+monthly.hours[hr$average_montly_hours>= 160 & hr$average_montly_hours<= 240]<- 1
+monthly.hours[hr$average_montly_hours > 240] <-2
+hr$monthly.hours<-monthly.hours
+
+# Work accident
+hr$Work_accident<-ifelse(as.logical(hr$Work_accident), 0, 1)
+```
+
+### Correlation plot
+
+As we can see from the correlation plot, the variables "Satify","Promotion_last_5years","Work_accident" is highly correlated staff status "left". So we choose these indicators as our feartures.
+```{r}
+M<-hr[,c(-9,-10)]
+M$left<-as.numeric(M$left)
+M<-M[,c(-1,-2,-4)]
+M<-cor(M)
+corrplot( M ,is.corr = FALSE, type = "full", order = "hclust", 
+         tl.col = "black", tl.srt = 30)
+
+```
+
+#Step 2 Survival Analysis
+Due to the information provided in our data set, we decide to use a Cox Proportional Hazard Model to predict the future performance. Because the left column represents the current status of an employee, we also know the time they left and the employement time if they still work in the company. We believe the cox model will work will on this kind of data.
+
+**A brief Introduction of Cox Model**
+
+The purpose of the model is to evaluate simultaneously the effect of several factors on survival. In other words, it allows us to examine how specified factors influence the rate of a particular event happening (e.g., infection, death) at a particular point in time. This rate is commonly referred as the hazard rate. Predictor variables (or factors) are usually termed covariates in the survival-analysis literature.
+
+The Cox model is expressed by the hazard function denoted by h(t). Briefly, the hazard function can be interpreted as the risk of dying at time t. It can be estimated as follow:
+
+**h(t)=h0(t)×exp(b1x1+b2x2+...+bpxp)**
+
+where,
+
+t represents the survival time
+
+h(t) is the hazard function determined by a set of p covariates (x1,x2,...,xpx1,x2,...,xp)
+the coefficients (b1,b2,...,bpb1,b2,...,bp) measure the impact (i.e., the effect size) of covariates.
+the term h0(t) is called the baseline hazard. It corresponds to the value of the hazard if all the xixi are equal to zero (the quantity exp(0) equals 1). The 't' in h(t) reminds us that the hazard may vary over time.
+The Cox model can be written as a multiple linear regression of the logarithm of the hazard on the variables xixi, with the baseline hazard being an 'intercept' term that varies with time.
+
+The quantities exp(bi)exp(bi) are called hazard ratios (HR). A value of bibi greater than zero, or equivalently a hazard ratio greater than one, indicates that as the value of the ithith covariate increases, the event hazard increases and thus the length of survival decreases.
+
+Put another way, a hazard ratio above 1 indicates a covariate that is positively associated with the event probability, and thus negatively associated with the length of survival.
+
+In summary,
+
+ * HR = 1: No effect
+ 
+ * HR < 1: Reduction in the hazard
+
+ * HR > 1: Increase in Hazard
+
+Our main results are in Survival Rates at t, which is exp(-Integral of HR from 0 to t)
+
+The first plot is for our full model, the total survival rates over years for all the data. We look at the summary and find the model z value is significant.
+```{r}
+#we first need to group some non-level variables
+#cox model: our full model
+hr$left<-as.numeric(hr$left)
+hr.cox <- coxph(Surv(time_spend_company, left) ~
+                  satisfy+promotion_last_5years+Work_accident, data = hr)
+
+#baseline values
+ggsurvplot(survfit(hr.cox), color = "#2E9FDF",
+           ggtheme = theme_minimal(),main="Survival Probability Plot for the full Cox Model")
+```
+
+**Evaluation of Cox Model**
+
+We took a look at the summary of our full model. R-square is really low compared to a regular regression model. However it is pretty usual for a real-life cox model. We also looked at the p-values for our chosen variables, and all of them have significant p-values. Also there are results for three different tests, they are also significant. (Even though we observe a 0 for p-values, it is really just close to zero). In conclusion, we believe this model is significant.
+```{r}
+summary(hr.cox)
+```
+
+
+**Application I:Then we take a look at the effect of individual variables**
+```{r}
+#Visualization for different variables
+#example: satisfy+promotion_last_5years+Work_accident
+fit<-survfit(Surv(time_spend_company, left) ~ satisfy, data = hr)
+ggsurvplot(fit,ggtheme = theme_minimal())
+fit1<-survfit(Surv(time_spend_company, left) ~ promotion_last_5years, data = hr)
+ggsurvplot(fit1,ggtheme = theme_minimal())
+fit2<-survfit(Surv(time_spend_company, left) ~ Work_accident, data = hr)
+ggsurvplot(fit2,ggtheme = theme_minimal())
+
+```
+
+**Application II:We can also use the model to predict the future action of employees. The following is the prediction for two made-up employees**
+```{r}
+# predict new data  
+new <- with(hr,
+               data.frame(satisfy=c(0.9,0.8), Work_accident=c(1,0), promotion_last_5years=c(0,1))
+               )
+#predicted values
+fit1<-survfit(hr.cox, newdata = new)
+predict<-data.frame(fit1$surv)
+predict$time<-1:8
+
+#convert the dataframe to long format
+predict_long<-melt(predict, id = "time")
+ggplot(data=predict_long, aes(x=time, y=value, colour=variable))+
+  geom_line()+
+  ggtitle("Prediction Plot for the action of employees in the future") +
+  labs(x="Year",y="Probability of a person staying in the same company")
+```
+
+

@@ -22,6 +22,22 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                         )
                             )
                           ),
+                    tabPanel("Instructions",
+                            
+                            titlePanel(h3(p("Have you always been confused why you keep losing your excellent employees? ", style = "font-family: 'kokonor'; font-si16pt"))),
+                            sidebarLayout(
+                              sidebarPanel(
+                               
+                           h4(p("Our app can give you answers! This smart app uses two models based on data sourced from Kaggle to give predictions. " ,style = "font-family: 'times'; font-si50pt")
+                            ),
+                           h4(p("For the Random Forest model, input different conditions of a particular employee to see whether he will leave or stay currently. For the survival model, the probability of staying in eight years is given.",style = "font-family: 'times'; font-si50pt")),
+                           h4(p("We can also fit a model based on your own human resources data. Your data should be a '.csv' file containing the following variables:",style = "font-family: 'times'; font-si50pt"))
+                                
+                           ),
+
+                           mainPanel()
+                            )
+                            ),
                    tabPanel("Random Forest Prediction",
                             div(class="outer",
                                 

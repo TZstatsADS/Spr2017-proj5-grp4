@@ -59,20 +59,19 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                              sliderInput("satis2", label = h5("Satisfaction Level"), min = 0, 
                                                          max = 1, value = 0.5),
                                              
+                                             selectInput("salary2", label = h5("Salary"),
+                                                         choices = list("High" = "high", "Medium" = "medium", "Low" = "low"),
+                                                         selected = 1),
                                              numericInput("workacc2", label = h5( "Work Accidents"),value = 0),
                                              numericInput("promt2", label = h5("Promotions in Last 5 Years"), value = 0),
                                              
                                              
-                                             # radioButtons("salary", label = h3("Salary"),
-                                             #            choices = list("High" = "high", "Medium" = "medium", "Low" = "low"),
-                                             #            selected = 1),
                                              #selectInput("position", label = h3("Position"),
-                                              #           choices = list("Accounting" = "accounting", "HR" = "hr", "IT" = "IT","Management" = "management","Marketing"="marketing","Product Manager" = "product_mng","R&D"="RandD","Sales"="sales","Support"="support","Technical"="technical"),
+                                             #           choices = list("Accounting" = "accounting", "HR" = "hr", "IT" = "IT","Management" = "management","Marketing"="marketing","Product Manager" = "product_mng","R&D"="RandD","Sales"="sales","Support"="support","Technical"="technical"),
                                              #            selected = "sales"),
-                                              numericInput("num3", label = h5("Number of Projects"), value = 0),
-                                              numericInput("num4", label = h5("Average Monthly Working Hours"), value = 0),
-                                              sliderInput("Evaluation", label = h5("Evaluation Score"), min = 0,
-                                                               max = 1, value = 0.5),
+                                              numericInput("proj2", label = h5("Number of Projects"), value = 0),
+                                              numericInput("hrs2", label = h5("Average Monthly Working Hours"), value = 0),
+                                              #sliderInput("Evaluation", label = h5("Evaluation Score"), min = 0,max = 1, value = 0.5),
                                              
                                              actionButton("action2", label = "Action")
                                              

@@ -134,6 +134,7 @@ pred <- hr_zhu[1,]
 randomforest.Model <- randomForest(left~ .,hr_zhu,ntree=25)
 thisrf.predict<-3
 
+
 #size = ~prob*50,
 shinyServer(function(input, output) {
   
@@ -156,7 +157,9 @@ shinyServer(function(input, output) {
   #   str(input$file)
   # })
 
-    
+  output$text1<-renderText({ 
+    "Leave or Stay?"
+  }) 
     output$plot2<- 
       renderImage({
         return(list(
@@ -170,11 +173,14 @@ shinyServer(function(input, output) {
 
   observeEvent(input$action2,{
     pred[1]<- input$satis2
-    pred[2]<- input$Evaluation
-    pred[3]<-input$num3
-    pred[4]<-input$num4
+    #pred[2]<- input$Evaluation
+    pred[3]<-input$proj2
+    pred[4]<-input$hrs2
     pred[6]<- input$workacc2
     pred[8]<- input$promt2
+    pred[10] <- ordered(input$salary2, c("low", "medium", "high"))
+
+    
     
     thisrf.predict <- predict(randomforest.Model,pred)
     

@@ -90,22 +90,25 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
     df<-data.frame(years = 1:n, prob = prob[1:n], pop = stay[1:n])
     upper<-fit1$upper
     lower<-fit1$lower
-    p <- plot_ly(predict_long, x = ~time) %>%
+    plot_ly(predict_long, x = ~time) %>%
       add_lines(y = ~value,
-                line = list(color = 'rgba(7, 164, 181, 1)')) %>%
+                line = list(color = 'rgba(7, 164, 181, 1)'),
+                name = 'Predict Line') %>%
       add_ribbons(ymin = lower,
                   ymax = upper,
                   line = list(color = 'rgba(7, 164, 181, 0.05)'),
                   fillcolor = 'rgba(7, 164, 181, 0.2)',
-                  name = "Confidence Interval") %>%
+                  name = '95% Confidence Interval') %>%
       add_markers(x=df$years, y = df$prob, showlegend = FALSE,
-                  marker = list(size = df$pop/max(df$pop)*30,opacity = 0.2, color = 'rgb(255, 25, 24)')) %>%
+                  marker = list(size = df$pop/max(df$pop)*30,opacity = 0.2, color = 'rgb(255, 25, 24)'),
+                  text = ~paste('Current Employees:', df$pop),
+                  name = 'True Value') %>%
       layout(title = 'Who will stay',
-             xaxis = list(title = 'Years', range=c(0,8)),
-             yaxis = list(title = 'Probability of Stay',range=c(0,1.1)),
-             showlegend = FALSE)%>% 
+             xaxis = list(title = 'Years', range=c(0,8.5)),
+             yaxis = list(title = 'Probability of Stay',range=c(0,1.1)))%>%
       layout(paper_bgcolor='transparent')%>%
       layout(plot_bgcolor='transparent')
+    
     
     # plot_ly(df, x = ~years, y = ~prob, type = 'scatter', mode = 'markers',
     #         marker = list( size=30,opacity = 0.5)
@@ -135,7 +138,6 @@ randomforest.Model <- randomForest(left~ .,hr_zhu,ntree=25)
 thisrf.predict<-3
 
 
-#size = ~prob*50,
 shinyServer(function(input, output) {
   
   # hr <- reactive({
@@ -153,9 +155,7 @@ shinyServer(function(input, output) {
     if (is.null(inFile)) return(NULL)
     hr <- read.csv(inFile$datapath, header = TRUE)
     hrpredict(hr,satislevel=as.numeric(input$satislevel),workaccid=as.numeric(input$workaccid),promt=as.numeric(input$promt))})
-  # output$value <- renderPrint({
-  #   str(input$file)
-  # })
+
 
   output$text1<-renderText({ 
     "Leave or Stay?"

@@ -37,24 +37,13 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                 #                  max = 1, value = 0.5),
                                 #      numericInput("workaccid", label = h3("Previous Work Accidents"), value = 0))
                                 #      
-                                #      
-                                #      
-                                #      
-                                #      
-                                #      
-                                #      
-                                #      ),
-                                #   hr(),
-                                #   
-                                # verbatimTextOutput("value2"),
-                                # verbatimTextOutput("value3")
+
                                 fluidPage(
                                   br(),
                                   fluidRow(
                                     column(3,
                                            wellPanel(
-                                             h4("Select Your Employee's Conditions"),
-                                             #fileInput("file", label = h3("File input")),
+                                             strong("Select Your Employee's Conditions"),
                                              #radioButtons("satislevel", label = h3("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
                                              sliderInput("satis2", label = h5("Satisfaction Level"), min = 0, 
                                                          max = 1, value = 0.5),
@@ -64,8 +53,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                                          selected = 1),
                                              numericInput("workacc2", label = h5( "Work Accidents"),value = 0),
                                              numericInput("promt2", label = h5("Promotions in Last 5 Years"), value = 0),
-                                             
-                                             
+
                                              #selectInput("position", label = h3("Position"),
                                              #           choices = list("Accounting" = "accounting", "HR" = "hr", "IT" = "IT","Management" = "management","Marketing"="marketing","Product Manager" = "product_mng","R&D"="RandD","Sales"="sales","Support"="support","Technical"="technical"),
                                              #            selected = "sales"),
@@ -79,7 +67,6 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                     ),
                                     br(),
                                     br(),
-                                    br(),
                                     column(9,
                                            h1(textOutput("text1")),
                                            imageOutput("plot2", height = 300)
@@ -87,10 +74,20 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                     )
                                   )
                                 )
-                                
                             )
-                            
+                                    # ,column(3,
+                                    #        wellPanel(
+                                    #          h3("load file"),
+                                    #          fileInput("file", label = h3("File input"),accept=c('text/csv',
+                                    #                                                              'text/comma-separated-values,text/plain',
+                                    #                                                              '.csv')),
+                                    #          actionButton("goButton2", "Go!")
+                                    # 
+                                    #        )
+                                    # )
+
                    ),
+                   
                     tabPanel("Make a Prediction",
                             div(class="outer",
                                 
@@ -106,12 +103,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                               #                  max = 1, value = 0.5),
                               #      numericInput("workaccid", label = h3("Previous Work Accidents"), value = 0))
                               #      
-                              #      
-                              #      
-                              #      
-                              #      
-                              #      
-                              #      
+
                               #      ),
                               #   hr(),
                               #   
@@ -148,7 +140,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   br(),
                                   br(),
                                   br(),
-                                   column(9,
+                                   column(7,
                                           #verbatimTextOutput("value")
                                          plotlyOutput("plot")
 

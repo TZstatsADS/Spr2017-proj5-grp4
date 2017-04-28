@@ -16,7 +16,7 @@ The purpose of our project is to make a prediction engine of employees' future d
 Our project contains two parts: first is our shiny app(a handy tool for the company);second is our main documents showing the calculation and comparision between Cox Model(Survival Analysis), Decision Tree, Naive Bayes, Random Forest, and Logistic Regression.
 
 The data our models based on is the human resource data from Kaggle. Our data set contains information for 14999 employees, which include their income, satifaction of the current company and whether have promotion, etc. The data set also provides their current status(left or not).
-![](variable.png)
+![](variable.jpg)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -352,3 +352,7 @@ plot(roc.obj3,col="purple",add=T)
 plot(roc.obj4,col="orange",add=T)
 legend(x=c(0.80,1.03),y=c(0.02,0.18),legend=c("Decision tree","Random Forest","Naives Bayes","Logistic regression"),col=c("blue","red","purple","orange"),lty=1,cex=0.6)
 ```
+
+#Shiny App Link
+[I'm shiny app link, click me]
+https://ads-yz3032.shinyapps.io/who_will_leave/

@@ -1,10 +1,9 @@
-# ADS Project 5: Open Topic
+# ADS Project 5:Who will leave next? ---Human Resources Advisory Report
 ![screenshot](figs/preface.jpg)
 
 Term: Spring 2017
 
 + Team #4
-+ Projec title: Who will leave next? ---Human Resources Advisory Report
 + Team members
 	+ Presenter: Yuan Mei
 	+ Yingxin Zhang

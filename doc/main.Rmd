@@ -44,7 +44,7 @@ library(ggvis)
 library(DT)
 library(e1071)
 library(rminer)
-
+library("ROCR")
 ```
 
 #Step1 Processing Data 
@@ -110,7 +110,7 @@ monthly.hours[hr$average_montly_hours > 240] <-2
 hr$monthly.hours<-monthly.hours
 
 # Work accident
-hr$Work_accident<-ifelse(as.logical(hr$Work_accident), 0, 1)
+hr$Work_accident<-ifelse(as.logical(hr$Work_accident), 1, 0)
 ```
 
 ### Correlation plot
@@ -322,7 +322,7 @@ gmlmodelbinded <- cbind(hr,predictions)
 confusionMatrix<- confusionMatrix(gmlmodelbinded$predictions,gmlmodelbinded$left)
 confusionMatrix
 
-library("ROCR")
+
 gmlmodelbinded$predictions <- as.numeric(paste(gmlmodelbinded$predictions))
 
 perf.obj <- prediction(predictions=gmlmodelbinded$predictions, labels=gmlmodelbinded$left)

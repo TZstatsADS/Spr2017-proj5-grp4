@@ -9,10 +9,10 @@ setwd("~/Desktop/Proj5")
 data<-read.csv("HR_comma_sep.csv",header = T)
 #add level to ppl left  1 means ppl left 0 means ppl stay
 
-data$left[data$left == 1] <- "Left" ;data$left[data$left == 0] <- "Remain"
+#data$left[data$left == 1] <- "Left" ;data$left[data$left == 0] <- "Remain"
 data$left <- as.factor(data$left)
 #ordered the salary
-data$salary <- ordered(data$salary, c("low", "medium", "high"))
+#data$salary <- ordered(data$salary, c("low", "medium", "high"))
 
 
 per_train <- 0.75 # percentage of training data
@@ -67,4 +67,4 @@ randomforest.Model <- randomForest(left~ .,data.train,ntree=30)
 randomforest.predict <- predict(randomforest.Model,data.test)
 mean(randomforest.predict == Y.test)
 
-head(data.test)
+#head(data.test)

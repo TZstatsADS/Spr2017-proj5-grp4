@@ -4,9 +4,7 @@ author: "sh3559"
 date: "April 26, 2017"
 output: html_document
 ---
-```{r}
-setwd("C:/Users/sh355/Desktop/columbia/2nd Semester/Applied Data Science/Spr2017-proj5-grp4")
-```
+
 ```{r}
 library(caret)
 library(rpart)
@@ -15,6 +13,7 @@ library(rpart.plot)
 ```
 
 ```{r, echo=F, message=F, warning=F}
+setwd("C:/Users/sh355/Desktop/columbia/2nd Semester/Applied Data Science/Spr2017-proj5-grp4")
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -47,7 +46,7 @@ library("caret")
 train_control<- trainControl(method="cv", number=5, repeats=3)
 head(train_control)
 ```
-### Tree learning
+### Decision tree
 
 ```{r, warning=F, fig.width=10}
 # train the model 
@@ -59,7 +58,8 @@ hr_model_tree<- cbind(hr,predictions)
 confusionMatrix<- confusionMatrix(hr_model_tree$predictions,hr_model_tree$left)
 confusionMatrix
 
-fancyRpartPlot(rpartmodel$finalModel)
+rpart.plot(rpartmodel$finalModel, type = 2, fallen.leaves = F, cex = 0.8, extra = 2)
+#fancyRpartPlot(rpartmodel$finalModel)
 
 library("ROCR")
 hr_model_tree$predictions <- as.numeric(paste(hr_model_tree$predictions))
@@ -75,6 +75,33 @@ plot(roc.obj,
 abline(0,1,col="grey")
 
 ```
+### Random Forest
+```{r}
+# train the model 
+randomforestModel<- train(left~., data=hr, trControl=train_control, ntree=30,method="rf")
+# make predictions
+predictions<- predict(randomforestModel,hr)
+hr_model_randomforest<- cbind(hr,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(hr_model_randomforest$predictions,hr_model_randomforest$left)
+confusionMatrix
+
+library("ROCR")
+hr_model_randomforest$predictions <- as.numeric(paste(hr_model_randomforest$predictions))
+# 
+perf.obj <- prediction(predictions=hr_model_randomforest$predictions, labels=hr_model_randomforest$left)
+# # Get data for ROC curve
+roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
+```
+
+
 ### Naives Bayes
 
 ```{r, echo=F, warning=F, fig.width=10}
@@ -91,6 +118,20 @@ e1071modelbinded <- cbind(hr,predictions)
 # summarize results
 confusionMatrix<- confusionMatrix(e1071modelbinded$predictions,e1071modelbinded$left)
 confusionMatrix
+
+library("ROCR")
+e1071modelbinded$predictions <- as.numeric(paste(e1071modelbinded$predictions))
+# 
+perf.obj <- prediction(predictions=e1071modelbinded$predictions, labels=e1071modelbinded$left)
+# # Get data for ROC curve
+roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
 ```
 ### Logistic regression
 
@@ -104,17 +145,17 @@ gmlmodelbinded <- cbind(hr,predictions)
 confusionMatrix<- confusionMatrix(gmlmodelbinded$predictions,gmlmodelbinded$left)
 confusionMatrix
 
-# library("ROCR")
-# gmlmodelbinded$predictions <- as.numeric(paste(gmlmodelbinded$predictions))
-# 
-# perf.obj <- prediction(predictions=gmlmodelbinded$predictions, labels=gmlmodelbinded$left)
-# # Get data for ROC curve
-# roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
-# plot(roc.obj,
-#      main="Cross-Sell - ROC Curves",
-#      xlab="1 - Specificity: False Positive Rate",
-#      ylab="Sensitivity: True Positive Rate",
-#      col="blue")
-# abline(0,1,col="grey")
+library("ROCR")
+gmlmodelbinded$predictions <- as.numeric(paste(gmlmodelbinded$predictions))
+
+perf.obj <- prediction(predictions=gmlmodelbinded$predictions, labels=gmlmodelbinded$left)
+# Get data for ROC curve
+roc.obj <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+     col="blue")
+abline(0,1,col="grey")
 
 ```

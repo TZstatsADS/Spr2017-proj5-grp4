@@ -48,6 +48,20 @@ auc(as.numeric(Y.test) - 1, tree.predict[, 2])
 rpart.plot(tree.model, type = 2, fallen.leaves = F, cex = 0.8, extra = 2)
 
 
+
+# So, what can we observe?
+# 
+# Satisfaction level appears to be the most import piece. If you’re above 0.46 you’re much more likely to stay (which is what we observed above).
+# If you have low satisfaction, the number of projects becomes import. If you’re on more projects you’re more likely to remain. If you’re on fewer projects – perhaps you see the writing on the wall?
+# If you’re happy, have been at the company for less than 4.5 years, and score over 81% on your last evaluation, you’re very likely to leave. And, it appears as if the “decider” is monthly hours over 216.
+# In brief:
+#   
+# If you’re successful and overworked, you leave.
+# If you’re unhappy and overworked, you leave.
+# If you’re unhappy and underworked, you leave.
+# If you’ve been at the company for more than 6.5 years, you’re more likely to be happy working longer hours.
+
+
 ####random forest###
 randomforest.Model <- randomForest(left~ .,data.train,ntree=30)
 randomforest.predict <- predict(randomforest.Model,data.test)

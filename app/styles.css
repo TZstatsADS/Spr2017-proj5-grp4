@@ -17,8 +17,8 @@ body, label, input, button, select {
   font-family: 'Helvetica Neue', Helvetica;
   font-weight: 200;
   background-image: url("HR2.png");
-  background-size: cover;
-  background-position: left top;
+  background-repeat: no-repeat;
+  background-position: middle;
 }
 h1, h2, h3, h4 { font-weight: 400; }
 

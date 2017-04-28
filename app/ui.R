@@ -92,7 +92,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
 
                    ),
                    
-                    tabPanel("Make a Prediction",
+                    tabPanel("Survival Model Prediction",
                             div(class="outer",
                                 
                                 tags$head(

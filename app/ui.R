@@ -149,7 +149,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   br(),
                                   br(),
                                   br(),
-                                   column(7,
+                                   column(9,
                                           #verbatimTextOutput("value")
                                          plotlyOutput("plot")
 

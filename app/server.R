@@ -158,7 +158,7 @@ shinyServer(function(input, output) {
 
 
   output$text1<-renderText({ 
-    "Leave or Stay?"
+    "Will you stay?"
   }) 
     output$plot2<- 
       renderImage({
@@ -186,7 +186,7 @@ shinyServer(function(input, output) {
     
     if(thisrf.predict == 1){
       output$text1<-renderText({ 
-        "I'm fucking leaving!"
+        "I'm gonna leave! Bye Bye~"
       })
       output$plot2<- 
         renderImage({
@@ -202,7 +202,7 @@ shinyServer(function(input, output) {
     }
     else if(thisrf.predict == 0){
       output$text1<-renderText({ 
-        "I'm gonna stay!"
+        "I'm gonna stay! Ha Ha~"
       })
       output$plot2 <- 
         renderImage({

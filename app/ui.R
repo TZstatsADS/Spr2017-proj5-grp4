@@ -58,7 +58,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   br(),
                                   fluidRow(
                                     column(3,
-                                           wellPanel(
+                                           wellPanel(id="tPanel", style = "overflow-y:scroll; max-height: 600px",
                                              strong("Select Your Employee's Conditions"),
                                              #radioButtons("satislevel", label = h3("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
                                              sliderInput("satis2", label = h5("Satisfaction Level"), min = 0, 

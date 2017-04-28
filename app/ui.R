@@ -119,18 +119,15 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                 br(),
                                 fluidRow(
                                   column(3,
-                                         wellPanel(
-                                           h4("Select Your Employee's Conditions"),
-                                            fileInput("file", label = list(h3("File Input"),h5("(Default option: upload 'HR_comma_sep.csv')")),accept=c('text/csv',
+                                         wellPanel(id="tPanel2", style = "overflow-y:scroll; max-height: 700px",
+                                           h5("Select Your Employee's Conditions"),
+                                           fileInput("file", label = list(h4("File Input"),h5("(Default option: upload 'HR_comma_sep.csv')")),accept=c('text/csv',
                                                                                                'text/comma-separated-values,text/plain',
                                                                                                '.csv')),
-                                           helpText(   a("Sample File Download",
-                                                         href="https://www.kaggle.com/ludobenistant/hr-analytics/downloads/human-resources-analytics.zip")
-                                           ),
                                            actionButton("goButton", "Go!"),
-                                           radioButtons("satislevel", label = h3("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
-                                           radioButtons("workaccid", label = h3( "Work Accidents"),choices = list("Have"=1,"Don't Have"=0),selected=1),
-                                           radioButtons("promt", label = h3("Promotions in Last 5 Years"), choices = list("Have"=1,"Don't Have"=0),selected=1)
+                                           radioButtons("satislevel", label = h4("Satisfaction Level"), choices =list("Satisfy with the job"=1,"Dissatisfy with the job"=0),selected = 1),
+                                           radioButtons("workaccid", label = h4( "Work Accidents"),choices = list("Have"=1,"Don't Have"=0),selected=1),
+                                           radioButtons("promt", label = h4("Promotions in Last 5 Years"), choices = list("Have"=1,"Don't Have"=0),selected=1)
                                            # radioButtons("salary", label = h3("Salary"),
                                            #            choices = list("High" = "high", "Medium" = "medium", "Low" = "low"),
                                            #            selected = 1),

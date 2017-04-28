@@ -38,7 +38,7 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
     # hr$sales<-rr()$sales
     # hr$salary<-rr()$salary
     # hr<-as.data.frame(hr)
-    
+
     hr$left <- factor(hr$left)
     satisfy<-rep(0,nrow(hr))
     satisfy[hr$satisfaction_level>= 0.5]<- 1
@@ -66,7 +66,8 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
 
     fit1<-survfit(hr.cox, newdata = new)
     predict<-data.frame(fit1$surv)
-    predict$time<-1:8
+    m<-length(unique(hr$time_spend_company))
+    predict$time<-1:m
     predict_long<-melt(predict, id = "time")
 
 
@@ -76,16 +77,21 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
     hr2<-hr2[,-4]
     hr3 <- filter(hr2, work == workaccid, prom == promt, satisfy == satislevel)
     total <- nrow(hr3)
-    stay <- c(total,rep(NA, 7))
-    for (i in 2:8){
+    stay <- c(total,rep(NA, m-1))
+    for (i in 2:m){
       if(sum(hr3$time == 3) !=0){
         stay[i] <- stay[i-1] - sum(hr3$time == i)
       }else{
         stay[i] <- stay[i-1]
       }
     }
-
-    prob <- stay/total
+    
+    if(total!=0){
+      prob <- stay/total
+    }else{
+        prob<-rep(0,m)
+    }
+    
     n<-sum(prob !=0)
     df<-data.frame(years = 1:n, prob = prob[1:n], pop = stay[1:n])
     upper<-fit1$upper
@@ -104,7 +110,7 @@ hrpredict <- function(hr,satislevel,workaccid,promt){
                   text = ~paste('Current Employees:', df$pop),
                   name = 'True Value') %>%
       layout(title = 'Who will stay',
-             xaxis = list(title = 'Years', range=c(0,8.5)),
+             xaxis = list(title = 'Years', range=c(0,m+0.5)),
              yaxis = list(title = 'Probability of Stay',range=c(0,1.1)))%>%
       layout(paper_bgcolor='transparent')%>%
       layout(plot_bgcolor='transparent')

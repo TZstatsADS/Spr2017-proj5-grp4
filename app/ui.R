@@ -23,8 +23,10 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                             )
                           ),
                     tabPanel("Instructions",
-                            
-                            
+                             mainPanel(width=12,
+                                       img(src="instruction.png", style="width:100%")
+                             )
+
                             ),
                    tabPanel("Random Forest Prediction",
                             div(class="outer",

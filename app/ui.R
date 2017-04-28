@@ -121,7 +121,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                   column(3,
                                          wellPanel(
                                            h4("Select Your Employee's Conditions"),
-                                           fileInput("file", label = h3("File input"),accept=c('text/csv',
+                                            fileInput("file", label = list(h3("File Input"),h5("(Default option: upload 'HR_comma_sep.csv')")),accept=c('text/csv',
                                                                                                'text/comma-separated-values,text/plain',
                                                                                                '.csv')),
                                            actionButton("goButton", "Go!"),

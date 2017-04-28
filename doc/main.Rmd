@@ -2,7 +2,7 @@
 title: "Applied Data Science Spring 2017 Project5 Team4 Main Report"
 author: "Yuan Mei, Yingxin Zhang, Kexin Nie, Xuanzi Xu, Senyao Han, He Zhu"
 date: "April 25, 2017"
-output: word_document
+output: pdf_document
 ---
 ![](entrepreneurs.jpg)
 
@@ -10,12 +10,20 @@ output: word_document
 
 #Introduction  
 
-The purpose of our project is to make a prediction of employees' future decision(Whether they will leave the company), using the human resource data on Kaggle. We think our app will be useful for Human Resource decision making and also social work research. Our data set contains information for 14999 employees, which include their income, satifaction of the current company and whether have promotion, etc. The data set also provides their current status(left or not).
+The purpose of our project is to make a prediction engine of employees' future decision(Whether they will leave the company) for the company. It's crucial to the company because: first, human resource department need to use the number of staff quiting to determine the new year recruitment plan; second, they also need to find out the factors behind the staff losing to develop better company mechanic to retain the old talents.
+![](HR_mission.png)
+
+Our project contains two parts: first is our shiny app(a handy tool for the company);second is our main documents showing the calculation and comparision between Cox Model(Survival Analysis), Decision Tree, Naive Bayes, Random Forest, and Logistic Regression.
+
+The data our models based on is the human resource data from Kaggle. Our data set contains information for 14999 employees, which include their income, satifaction of the current company and whether have promotion, etc. The data set also provides their current status(left or not).
+![](variable.png)
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r,echo=FALSE}
+
 # load package
 #if (!require("corrplot")) install.packages('corrplot')
 #if (!require("survival")) install.packages('survival')
@@ -23,17 +31,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(corrplot)
 library(dplyr) 
-library(rattle)
+#library(rattle)
 library(survival)
 library(survminer)
 library(ggplot2)
 library(reshape2)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(tidyr)
+library(ggvis)
+library(DT)
+library(e1071)
+library(rminer)
 
 ```
 
 #Step1 Processing Data 
 ###Import data
 ```{r,echo=FALSE}
+setwd("~/Documents/GitHub/Spr2017-proj5-grp4/data")
 hr <- as.data.frame(read.csv("HR_comma_sep.csv") )
 ```
 
@@ -118,7 +135,7 @@ The purpose of the model is to evaluate simultaneously the effect of several fac
 
 The Cox model is expressed by the hazard function denoted by h(t). Briefly, the hazard function can be interpreted as the risk of dying at time t. It can be estimated as follow:
 
-**h(t)=h0(t)�exp(b1x1+b2x2+...+bpxp)**
+**h(t)=h0(t)?exp(b1x1+b2x2+...+bpxp)**
 
 where,
 
@@ -196,4 +213,142 @@ ggplot(data=predict_long, aes(x=time, y=value, colour=variable))+
   labs(x="Year",y="Probability of a person staying in the same company")
 ```
 
+#Step3 More Prediction Models
+## Cross-Validation
+we split the data randomly into training set using 5-fold-cross-validation
+```{r}
+# Set the target variable as a factor
+hr$left <- as.factor(hr$left)
+## install.packages("caret") 
+library("caret")
+# cross-validation
+train_control<- trainControl(method="cv", number=5, repeats=3)
+head(train_control)
+```
 
+## Decision tree
+General idea of decision tree is,using a tree-like graph or model of decisions and their possible consequences(The status of the employee). 
+```{r, warning=F, fig.width=10}
+# train the model 
+rpartmodel<- train(left~., data=hr, trControl=train_control, method="rpart")
+# make predictions
+predictions<- predict(rpartmodel,hr)
+hr_model_tree<- cbind(hr,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(hr_model_tree$predictions,hr_model_tree$left)
+confusionMatrix
+
+rpart.plot(rpartmodel$finalModel, type = 2, fallen.leaves = F, cex = 0.8, extra = 2)
+#fancyRpartPlot(rpartmodel$finalModel)
+
+library("ROCR")
+hr_model_tree$predictions <- as.numeric(paste(hr_model_tree$predictions))
+# 
+perf.obj <- prediction(predictions=hr_model_tree$predictions, labels=hr_model_tree$left)
+# # Get data for ROC curve
+roc.obj1 <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj1,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
+```
+
+## Random Forest
+The idea outperform decision tree by constructing multiple decision trees, and classify the new object down each of the trees in the forest. The forest chooses the classifacation having the most votes from the trees.
+```{r}
+# train the model 
+randomforestModel<- train(left~., data=hr, trControl=train_control, ntree=30,method="rf")
+# make predictions
+predictions<- predict(randomforestModel,hr)
+hr_model_randomforest<- cbind(hr,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(hr_model_randomforest$predictions,hr_model_randomforest$left)
+confusionMatrix
+
+library("ROCR")
+hr_model_randomforest$predictions <- as.numeric(paste(hr_model_randomforest$predictions))
+# 
+perf.obj <- prediction(predictions=hr_model_randomforest$predictions, labels=hr_model_randomforest$left)
+# # Get data for ROC curve
+roc.obj2 <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj2,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
+```
+
+##Naives Bayes
+Naive Bayes methods are a set of supervised learning algorithms based on applying Bayes’ theorem with the “naive” assumption of independence between every pair of features. We use bayesian probability to calculate the probability of occurence of each features and decide the classfication results based on the highest probability.
+```{r, warning=F, fig.width=10}
+# train the model 
+e1071model2 <- train(left~., data=hr, trControl=train_control, method="nb")
+# make predictions
+predictions<- predict(e1071model2,hr)
+e1071modelbinded <- cbind(hr,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(e1071modelbinded$predictions,e1071modelbinded$left)
+confusionMatrix
+
+library("ROCR")
+e1071modelbinded$predictions <- as.numeric(paste(e1071modelbinded$predictions))
+# 
+perf.obj <- prediction(predictions=e1071modelbinded$predictions, labels=e1071modelbinded$left)
+# # Get data for ROC curve
+roc.obj3 <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj3,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+
+```
+
+## Logistic regression
+Logistic regression is the appropriate regression analysis to conduct when the dependent variable is dichotomous (binary). Logistic regression is used to describe data and to explain the relationship between one dependent binary variable and one or more nominal, ordinal, interval or ratio-level independent variables.
+```{r, warning=F, fig.width=10}
+# train the model 
+gmlmodel <- train(left~., data=hr, trControl=train_control, method="LogitBoost")
+# make predictions
+predictions<- predict(gmlmodel,hr)
+gmlmodelbinded <- cbind(hr,predictions)
+# summarize results
+confusionMatrix<- confusionMatrix(gmlmodelbinded$predictions,gmlmodelbinded$left)
+confusionMatrix
+
+library("ROCR")
+gmlmodelbinded$predictions <- as.numeric(paste(gmlmodelbinded$predictions))
+
+perf.obj <- prediction(predictions=gmlmodelbinded$predictions, labels=gmlmodelbinded$left)
+# Get data for ROC curve
+roc.obj4 <- performance(perf.obj, measure="tpr", x.measure="fpr")
+plot(roc.obj4,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+     col="blue")
+abline(0,1,col="grey")
+
+```
+
+#Step4 Comparision
+Conclusion: Random Forest outperform other models.
+```{r}
+library("ROCR")
+plot(roc.obj1,
+     main="Cross-Sell - ROC Curves",
+     xlab="1 - Specificity: False Positive Rate",
+     ylab="Sensitivity: True Positive Rate",
+    col="blue")
+abline(0,1,col="grey")
+plot(roc.obj2,col="red",add=T)
+plot(roc.obj3,col="purple",add=T)
+plot(roc.obj4,col="orange",add=T)
+legend(x=c(0.80,1.03),y=c(0.02,0.18),legend=c("Decision tree","Random Forest","Naives Bayes","Logistic regression"),col=c("blue","red","purple","orange"),lty=1,cex=0.6)
+```

@@ -64,7 +64,7 @@ shinyUI(navbarPage("Who Will Leave",fluid = TRUE,
                                              #           choices = list("Accounting" = "accounting", "HR" = "hr", "IT" = "IT","Management" = "management","Marketing"="marketing","Product Manager" = "product_mng","R&D"="RandD","Sales"="sales","Support"="support","Technical"="technical"),
                                              #            selected = "sales"),
                                               numericInput("proj2", label = h5("Number of Projects"), value = 0),
-                                              numericInput("hrs2", label = h5("Average Monthly Working Hours"), value = 0),
+                                              numericInput("hrs2", label = h5("Average Monthly Working Hours"), value = 160),
                                               #sliderInput("Evaluation", label = h5("Evaluation Score"), min = 0,max = 1, value = 0.5),
                                              
                                              actionButton("action2", label = "Action")
